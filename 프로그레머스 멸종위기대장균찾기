@@ -1,0 +1,56 @@
+-- 내가 작성한 쿼리 -> 오답
+with a as (select id
+       , parent_id   
+       , case when id in (select id from ecoli_data where parent_id is null) then '1'
+         when id in (select id from ecoli_data where parent_id in ((select id from ecoli_data where parent_id is null))) then '2'
+         when id in (select id from ecoli_data where parent_id in ((select id from ecoli_data where parent_id in ((select id from ecoli_data where parent_id is null))))) then '3'
+         else '4' end as generation
+from ecoli_data)
+
+select count(*) as 'COUNT', generation as 'GENERATION'
+from (
+select id
+       , parent_id 
+       , generation
+       , case when id not in (select ifnull(parent_id,'o') from a) then 'X'
+         else 'O' end as is_nextgen_exists
+from a) as a
+where is_nextgen_exists = 'X'
+group by generation
+order by generation;
+
+-- 정석 쿼리
+with RECURSIVE Hierarchy as (
+    select
+    ID,
+    PARENT_ID,
+    1 as Level
+    from 
+    ECOLI_DATA 
+    where 
+    PARENT_ID is NULL
+
+    UNION ALL
+
+    select
+    e.ID,
+    e.PARENT_ID,
+    h.Level + 1
+    from
+    ECOLI_DATA e
+    inner join Hierarchy h on e.PARENT_ID = h.ID
+)
+SELECT
+    count(h1.Level) as count,
+    h1.Level as GENERATION
+from Hierarchy h1
+left Join Hierarchy h2
+on h1.ID = h2.PARENT_ID
+where h2.ID is null
+group by GENERATION
+ORDER BY
+    h1.Level;
+
+-- with문과 with recursive 사용의 차이 
+-- 결과는 똑같이 나오나 내가 작성한 쿼리는 추후에 추가될 다음 세대를 다를 수 없고
+-- 정석 쿼리는 추후에 추가될 데이터도 처리할 수 있음
