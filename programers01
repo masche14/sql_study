@@ -1,0 +1,5 @@
+select to_char(datetime, 'hh24') HOUR, count(*) COUNT
+from animal_outs
+where name is not null
+group by to_char(datetime, 'hh24')
+order by to_char(datetime, 'hh24') asc;
