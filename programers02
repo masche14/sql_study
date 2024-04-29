@@ -1,0 +1,7 @@
+select animal_id, animal_type, name
+from animal_outs
+where animal_id in (
+select animal_id
+from animal_ins
+where substr(sex_upon_intake, 1, instr(sex_upon_intake,' ')-1) not in ('Spayed', 'Neutered')
+    ) and substr(sex_upon_outcome, 1, instr(sex_upon_outcome,' ')-1) in ('Spayed', 'Neutered')
