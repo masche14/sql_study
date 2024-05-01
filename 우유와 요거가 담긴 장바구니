@@ -1,0 +1,10 @@
+select distinct a.cart_id
+from (
+select *
+from cart_products
+where name = 'Milk') a
+, (select *
+  from cart_products
+  where name = 'Yogurt') b
+where a.cart_id = b.cart_id
+order by a.cart_id asc
