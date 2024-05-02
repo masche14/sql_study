@@ -1,0 +1,8 @@
+select author_id, author_name, category, sum(sales) total_sales
+from (
+select b.author_id, a.author_name, b.category, b.price*bs.sales as sales
+from book b, author a, book_sales bs
+where b.author_id=a.author_id and b.book_id=bs.book_id and to_char(bs.sales_date,'yyyy-mm')='2022-01'
+)
+group by author_id, author_name, category
+order by author_id, category desc
