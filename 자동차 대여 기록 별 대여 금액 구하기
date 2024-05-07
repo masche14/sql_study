@@ -1,0 +1,25 @@
+with nodcfee as (select rh.history_id, cc.car_id, cc.car_type, rh.start_date, rh.end_date, rh.end_date - start_date as days, (rh.end_date - start_date+1)*cc.daily_fee as fee
+from car_rental_company_car cc, car_rental_company_rental_history rh
+where cc.car_type='트럭' and cc.car_id=rh.car_id)
+, discount_standard as (
+select car_type, to_number(substr(duration_type,1,instr(duration_type,'일')-1)) as standard, discount_rate
+from car_rental_company_discount_plan
+where car_type='트럭'
+)
+, discount_for_history as (
+select history_id, max(discount_rate) discount_rate
+from (
+select ndf.history_id, ndf.days, case when ndf.days >= ds.standard then discount_rate else 0 end as discount_rate
+from nodcfee ndf, discount_standard ds
+order by ndf.history_id, discount_rate desc
+)
+group by history_id
+)
+
+select history_id, fee
+from (
+select ndf.history_id, ndf.fee*(100-dfh.discount_rate)/100 as fee
+from nodcfee ndf, discount_for_history dfh
+where ndf.history_id = dfh.history_id
+)
+order by fee desc, history_id desc
