@@ -1,0 +1,5 @@
+select extract(year from os.sales_date) year, extract(month from os.sales_date) moth, ui.gender, count(distinct ui.user_id) users
+from (select * from user_info where gender is not null) ui, online_sale os
+where ui.user_id=os.user_id
+group by extract(year from os.sales_date), extract(month from os.sales_date), ui.gender
+order by 1 asc, 2 asc, 3 asc
