@@ -1,0 +1,16 @@
+with fo as (
+select *
+from food_order fo
+where to_char(produce_date,'yyyy-mm') = '2022-05'
+)
+, cnt as (
+select fo.product_id, fp.product_name, sum(fo.amount) as amount
+from fo, food_product fp
+where fo.product_id = fp.product_id
+group by fo.product_id, fp.product_name
+)
+
+select cnt.product_id, cnt.product_name, cnt.amount*fp.price as total_sales
+from cnt, food_product fp
+where cnt.product_id=fp.product_id
+order by cnt.amount*fp.price desc, cnt.product_id
