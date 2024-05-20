@@ -1,0 +1,21 @@
+with rcnt as (
+select member_id, count(*) as cnt
+from rest_review
+group by member_id
+order by count(*) desc, member_id desc
+)
+, max_m as (
+select member_id
+from rcnt
+where cnt = (select max(cnt) from rcnt)
+)
+, mw as (
+select *
+from rest_review
+where member_id in (select member_id from max_m)
+)
+
+select mp.member_name, mw.review_text, to_char(mw.review_date,'yyyy-mm-dd') as review_date
+from mw, member_profile mp
+where mw.member_id=mp.member_id
+order by 1, 3, 2
