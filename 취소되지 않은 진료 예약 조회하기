@@ -1,0 +1,10 @@
+with uc as (
+select *
+from appointment
+where mcdp_cd='CS' and apnt_cncl_yn='N' and to_char(apnt_ymd, 'yyyy-mm-dd')='2022-04-13'
+)
+
+select uc.apnt_no, p.pt_name, p.pt_no, uc.mcdp_cd, d.dr_name, uc.apnt_ymd
+from uc, patient p, doctor d
+where uc.pt_no=p.pt_no and uc.mddr_id=d.dr_id
+order by 6 asc
