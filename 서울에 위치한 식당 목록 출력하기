@@ -1,0 +1,15 @@
+with seoul as (
+select *
+from rest_info
+where address like '서울%'
+)
+, avg_score as (
+select rest_id, round(avg(review_score),2) score
+from rest_review
+group by rest_id
+)
+
+select s.rest_id, s.rest_name, s.food_type, s.favorites, s.address, score
+from seoul s, avg_score a
+where s.rest_id=a.rest_id
+order by 6 desc, 4 desc
