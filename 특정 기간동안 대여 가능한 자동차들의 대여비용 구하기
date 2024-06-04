@@ -1,0 +1,26 @@
+with sc as (
+select *
+from car_rental_company_car
+where car_type in ('세단', 'SUV')
+)
+, sdp as (
+select *
+from car_rental_company_discount_plan
+where car_type in ('세단', 'SUV') and substr(duration_type, 1, instr(duration_type, '일')-1)='30'
+)
+, cf as (
+select *
+from sc
+where car_id not in (select car_id
+from car_rental_company_rental_history
+where end_date >= to_date('2022-11-01', 'yyyy-mm-dd') and start_date <= to_date('2022-11-30', 'yyyy-mm-dd'))
+)
+
+select *
+from (
+select cf.car_id, cf.car_type, round(cf.daily_fee*(100-discount_rate)*30/100,0) as fee
+from cf, sdp
+where cf.car_type = sdp.car_type
+)
+where fee >= 500000 and fee < 2000000
+order by 3 desc, 2 asc, 1 asc
