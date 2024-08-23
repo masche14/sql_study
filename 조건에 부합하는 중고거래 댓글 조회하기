@@ -1,0 +1,8 @@
+with b10 as (select *
+from used_goods_board b
+where to_char(created_date,'yyyy-mm')='2022-10')
+
+select b10.title, b10.board_id, r.reply_id, r.writer_id, r.contents, to_char(r.created_date,'yyyy-mm-dd') as created_date
+from b10, used_goods_reply r
+where b10.board_id = r.board_id
+order by 6 asc, 1 asc
